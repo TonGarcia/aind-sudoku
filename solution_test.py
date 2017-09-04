@@ -68,7 +68,9 @@ class TestNakedTwins(unittest.TestCase):
     ]
 
     def test_naked_twins(self):
-        self.assertTrue(solution.naked_twins(self.before_naked_twins_1) in self.possible_solutions_1,
+        guess = solution.naked_twins(self.before_naked_twins_1)
+        expected = self.possible_solutions_1
+        self.assertTrue(guess in expected,
                         "Your naked_twins function produced an unexpected board.")
 
     def test_naked_twins2(self):

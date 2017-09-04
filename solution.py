@@ -3,6 +3,21 @@ cols = '123456789'
 
 assignments = []
 
+def cross(A, B):
+    "Cross product of elements in A and elements in B."
+    # Associate LETTERs side with NUMBERs side, creating A1,A1...
+    return [s + t for s in A for t in B]
+
+# initializing
+grid_dict = {} ## grid as dictionary
+boxes = cross(rows, cols) ## boxes "names", like: A1,A2... (list)
+row_units = [cross(r, cols) for r in rows] ## rows: [[A1..A9],[B1...B9]] (list of lists)
+column_units = [cross(rows, c) for c in cols] ## columns: [[A1...I1],[A2...I2]] (list of lists)
+square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')] ## square (3x3): [[A1...C3],[A4..C6]] (list of lists)
+unitlist = row_units + column_units + square_units ## list of all lists perspectives
+units = dict((s, [u for u in unitlist if s in u]) for s in boxes) ## referencing boxes per unit (square), as dict of lists of lists {[[]]}
+peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes) ## peers per box as dict of dict {{}}
+
 def assign_value(values, box, value):
     """
     Please use this function to update your values dictionary!
@@ -28,22 +43,23 @@ def naked_twins(values):
     """
 
     # Find all instances of naked twins
-    # Eliminate the naked twins as possibilities for their peers
+    for box in values:
+        value_box = values[box]
 
-def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    # Associate LETTERs side with NUMBERs side, creating A1,A1...
-    return [s + t for s in A for t in B]
+        # Check if current box has the naked twins candidate length
+        if len(value_box) == 2:
+            # search on it twin peer
+            for peer in peers[box]:
+                # If it true, so FOUND it naked peer
+                if value_box == values[peer]:
+                    twin_peer = peer
+                    for deep_peer in peers[box]:
+                        if len(values[deep_peer]) > len(value_box) and (deep_peer[0]==box[0] or deep_peer[1]==box[1]) and (twin_peer in peers[deep_peer]):
+                            for digit in value_box:
+                                if digit in values[deep_peer]:
+                                    assign_value(values, deep_peer, values[deep_peer].replace(digit, ''))
 
-# initializing
-grid_dict = {} ## grid as dictionary
-boxes = cross(rows, cols) ## boxes "names", like: A1,A2... (list)
-row_units = [cross(r, cols) for r in rows] ## rows: [[A1..A9],[B1...B9]] (list of lists)
-column_units = [cross(rows, c) for c in cols] ## columns: [[A1...I1],[A2...I2]] (list of lists)
-square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')] ## square (3x3): [[A1...C3],[A4..C6]] (list of lists)
-unitlist = row_units + column_units + square_units ## list of all lists perspectives
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes) ## referencing boxes per unit (square), as dict of lists of lists {[[]]}
-peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes) ## peers per box as dict of dict {{}}
+    return values
 
 def grid_values(grid):
     """
