@@ -91,7 +91,8 @@ def eliminate(values):
         for peer in peers[box]:
             # eliminate it current iteration digit from it peer boxes
             # peers is a dict of boxes which are another dictionaries with associated boxes relation
-            values[peer] = values[peer].replace(digit,'')
+            # values[peer] = values[peer].replace(digit,'')
+            assign_value(values, peer, values[peer].replace(digit,''))
     return values
 
 def only_choice(values):
@@ -103,7 +104,8 @@ def only_choice(values):
             dplaces = [box for box in unit if digit in values[box]]
             # if it doesn't repeat, so there is a only choice place
             if len(dplaces) == 1:
-                values[dplaces[0]] = digit
+                # values[dplaces[0]] = digit
+                assign_value(values, dplaces[0], digit)
     return values
 
 def reduce_puzzle(values):
@@ -165,6 +167,11 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
+    solved = True
+    searched_grid = search(grid)
+    solved = [False for sg in searched_grid if len(searched_grid[sg]) > 1]
+    if solved: return searched_grid
+
 
 if __name__ == '__main__':
     diag_sudoku_grid = '2.............62....1....7...6..8...3...9...7...6..4...4....8....52.............3'
