@@ -41,7 +41,6 @@ def naked_twins(values):
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
-
     # Find all instances of naked twins
     for box in values:
         value_box = values[box]
