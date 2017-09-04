@@ -54,7 +54,7 @@ def naked_twins(values):
                 if value_box == values[peer]:
                     twin_peer = peer
                     for deep_peer in peers[box]:
-                        if len(values[deep_peer]) > len(value_box) and (deep_peer[0]==box[0] or deep_peer[1]==box[1]) and (twin_peer in peers[deep_peer]):
+                        if twin_peer in peers[deep_peer]:
                             for digit in value_box:
                                 if digit in values[deep_peer]:
                                     assign_value(values, deep_peer, values[deep_peer].replace(digit, ''))
