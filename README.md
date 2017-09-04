@@ -22,6 +22,11 @@ Optionally, you can also install pygame if you want to see your visualization. I
 
 If not, please see how to download pygame [here](http://www.pygame.org/download.shtml).
 
+To run it on Mac, must install:
+```shell
+    $ brew install sdl sdl_ttf sdl_image sdl_mixer portmidi && conda install binstar && conda install anaconda-client
+```
+
 ### Code
 
 * `solution.py` - You'll fill this in as part of your solution.
