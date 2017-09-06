@@ -159,10 +159,10 @@ def reduce_puzzle(values):
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
         # Eliminate Strategy
-        eliminated_grid = eliminate(values)
+        eliminate(values)
 
         # Only Choice Strategy
-        only_choice_grid = only_choice(eliminated_grid)
+        only_choice(values)
 
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])

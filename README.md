@@ -7,7 +7,7 @@ A: Find a box that have a twin as peer, than eliminate the digits at non-twin pe
 
 # Question 2 (Diagonal Sudoku)
 Q: How do we use constraint propagation to solve the diagonal sudoku problem?  
-A: *Student should provide answer here*
+A: It is the same way done before, but just added as an unit the diagonal lines, so it is a new "unit" kind, than propagating the same logic for square units validations it works perfectly 
 
 ### Install
 
