@@ -109,7 +109,7 @@ eliminated_sudoku_grid = eliminate(grid_values(project_sudoku_grid_example))
 def only_choice(values):
     """Finalize all values that are the only choice for a unit.
 
-    Go through all the units, and whenever there is a unit with a value
+    Go through all the units(3x3), and whenever there is a unit with a value
     that only fits in one box, assign the value to this box.
 
     Input: Sudoku in dictionary form.
@@ -135,16 +135,17 @@ only_choice(eliminated_sudoku_grid)
 # In[12]:
 
 def reduce_puzzle(values):
+    # Propagate eliminate & only_choice
     stalled = False
     while not stalled:
         # Check how many boxes have a determined value
         solved_values_before = len([box for box in values.keys() if len(values[box]) == 1])
 
         # Your code here: Use the Eliminate Strategy
-        eliminated_grid = eliminate(values)
+        values = eliminate(values)
 
         # Your code here: Use the Only Choice Strategy
-        only_choice_grid = only_choice(eliminated_grid)
+        values = only_choice(values)
 
         # Check how many boxes have a determined value, to compare
         solved_values_after = len([box for box in values.keys() if len(values[box]) == 1])

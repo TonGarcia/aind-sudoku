@@ -1,22 +1,26 @@
+assignments = []
 rows = 'ABCDEFGHI'
 cols = '123456789'
 
-assignments = []
 
 def cross(A, B):
-    "Cross product of elements in A and elements in B."
-    # Associate LETTERs side with NUMBERs side, creating A1,A1...
+    """ Cross product of elements in A and elements in B. """
     return [s + t for s in A for t in B]
 
+
 # initializing
-grid_dict = {} ## grid as dictionary
-boxes = cross(rows, cols) ## boxes "names", like: A1,A2... (list)
-row_units = [cross(r, cols) for r in rows] ## rows: [[A1..A9],[B1...B9]] (list of lists)
-column_units = [cross(rows, c) for c in cols] ## columns: [[A1...I1],[A2...I2]] (list of lists)
-square_units = [cross(rs, cs) for rs in ('ABC','DEF','GHI') for cs in ('123','456','789')] ## square (3x3): [[A1...C3],[A4..C6]] (list of lists)
-unitlist = row_units + column_units + square_units ## list of all lists perspectives
-units = dict((s, [u for u in unitlist if s in u]) for s in boxes) ## referencing boxes per unit (square), as dict of lists of lists {[[]]}
-peers = dict((s, set(sum(units[s],[]))-set([s])) for s in boxes) ## peers per box as dict of dict {{}}
+grid_dict = {}  ## grid as dictionary
+boxes = cross(rows, cols)  ## boxes "names", like: A1,A2... (list)
+row_units = [cross(r, cols) for r in rows]  ## rows: [[A1..A9],[B1...B9]] (list of lists)
+column_units = [cross(rows, c) for c in cols]  ## columns: [[A1...I1],[A2...I2]] (list of lists)
+square_units = [cross(rs, cs) for rs in ('ABC', 'DEF', 'GHI') for cs in
+                ('123', '456', '789')]  ## square (3x3): [[A1...C3],[A4..C6]] (list of lists)
+diagonal_units = [[x + y for x, y in zip(rows, cols)], [x + y for x, y in zip(rows, reversed(cols))]]  ## diagonal lines
+unitlist = row_units + column_units + square_units + diagonal_units  ## list of all lists perspectives
+units = dict((s, [u for u in unitlist if s in u]) for s in
+             boxes)  ## referencing boxes per unit (square), as dict of lists of lists {[[]]}
+peers = dict((s, set(sum(units[s], [])) - set([s])) for s in boxes)  ## peers per box as dict of dict {{}}
+
 
 def assign_value(values, box, value):
     """
@@ -33,11 +37,11 @@ def assign_value(values, box, value):
         assignments.append(values.copy())
     return values
 
+
 def naked_twins(values):
     """Eliminate values using the naked twins strategy.
     Args:
         values(dict): a dictionary of the form {'box_name': '123456789', ...}
-
     Returns:
         the values dictionary with the naked twins eliminated from peers.
     """
@@ -57,8 +61,8 @@ def naked_twins(values):
                             for digit in value_box:
                                 if digit in values[deep_peer]:
                                     assign_value(values, deep_peer, values[deep_peer].replace(digit, ''))
-
     return values
+
 
 def grid_values(grid):
     """
@@ -70,7 +74,6 @@ def grid_values(grid):
             Keys: The boxes, e.g., 'A1'
             Values: The value in each box, e.g., '8'. If the box has no value, then the value will be '123456789'.
     """
-    # iterate each box (A1,A2...) & each value (char index element at received grid/sudoku)
     for box, grid_v in zip(boxes, grid):
         if grid_v == '.':
             # if . it means an empty box, so receive all numbers
@@ -78,8 +81,9 @@ def grid_values(grid):
         elif grid_v in cols:
             # if cols (string of all numbers) contains it grid_value, so store it as it is
             grid_dict[box] = grid_v
-    # return it filled dictionary
+            # return it filled dictionary
     return grid_dict
+
 
 def display(values):
     """
@@ -87,15 +91,23 @@ def display(values):
     Args:
         values(dict): The sudoku in dictionary form
     """
-    width = 1+max(len(values[s]) for s in boxes)
-    line = '+'.join(['-'*(width*3)]*3)
+    width = 1 + max(len(values[s]) for s in boxes)
+    line = '+'.join(['-' * (width * 3)] * 3)
     for r in rows:
-        print(''.join(values[r+c].center(width)+('|' if c in '36' else '')
+        print(''.join(values[r + c].center(width) + ('|' if c in '36' else '')
                       for c in cols))
         if r in 'CF': print(line)
     return
 
+
 def eliminate(values):
+    """
+    Go through all the boxes, and whenever there is a box with a value, eliminate this value from the values of all its peers.
+    Args:
+        values(dict): A sudoku in dictionary form.
+    Returns:
+        evalues(dict): The resulting sudoku in dictionary form.
+    """
     # boxes keys "constant"
     boxes = [box for box in values.keys() if len(values[box]) == 1]
     # iterate each box
@@ -107,10 +119,18 @@ def eliminate(values):
             # eliminate it current iteration digit from it peer boxes
             # peers is a dict of boxes which are another dictionaries with associated boxes relation
             # values[peer] = values[peer].replace(digit,'')
-            assign_value(values, peer, values[peer].replace(digit,''))
+            assign_value(values, peer, values[peer].replace(digit, ''))
     return values
 
+
 def only_choice(values):
+    """
+    Go through all the units, and whenever there is a unit with a value that only fits in one box, assign the value to this box.
+    Args:
+        values(dict): A sudoku in dictionary form.
+    Returns:
+        values(dict): The resulting sudoku in dictionary form.
+    """
     # iterate each unit (3x3) as array, better than iterate it list
     for unit in unitlist:
         # iterate numbers values to find it "chars" on each box
@@ -123,7 +143,16 @@ def only_choice(values):
                 assign_value(values, dplaces[0], digit)
     return values
 
+
 def reduce_puzzle(values):
+    """ Iterate eliminate(), naked_twins() and only_choice(). If at some point, there is a box with no available values, return False.
+    If the sudoku is solved, return the sudoku.
+    If after an iteration of both functions, the sudoku remains the same, return the sudoku.
+    Args:
+        values(dict): A sudoku in dictionary form.
+    Returns:
+        values(dict): The resulting sudoku in dictionary form.
+    """
     stalled = False
     while not stalled:
         # Check how many boxes have a determined value
@@ -144,14 +173,14 @@ def reduce_puzzle(values):
             return False
     return values
 
-def search(values):
-    "Using depth-first search and propagation, create a search tree and solve the sudoku."
-    # Prevent Type Error
-    values_type = type(values)
-    values = grid_values(values) if values_type == str else values
-    if values == False:
-        return 'wrong values type (not a String neither a Dict)'
 
+def search(values):
+    """ Using depth-first search and constraint propagation, try all possible values.
+    Args:
+        values(dict): A sudoku in dictionary form.
+    Returns:
+        The values dictionary containing a solved sudoku or False if sudoku could not be solved
+    """
     # First, reduce the puzzle using the previous function
     reduced = reduce_puzzle(values)
     if reduced is False:
@@ -173,6 +202,7 @@ def search(values):
         if attempt:
             return attempt
 
+
 def solve(grid):
     """
     Find the solution to a Sudoku grid.
@@ -182,10 +212,9 @@ def solve(grid):
     Returns:
         The dictionary representation of the final sudoku grid. False if no solution exists.
     """
-    solved = True
-    searched_grid = search(grid)
-    solved = [False for sg in searched_grid if len(searched_grid[sg]) > 1]
-    if solved: return searched_grid
+    values = grid_values(grid)
+    values = search(values)
+    return values
 
 
 if __name__ == '__main__':
@@ -194,9 +223,7 @@ if __name__ == '__main__':
 
     try:
         from visualize import visualize_assignments
-        visualize_assignments(assignments)
 
-    except SystemExit:
-        pass
+        visualize_assignments(assignments)
     except:
         print('We could not visualize your board due to a pygame issue. Not a problem! It is not a requirement.')
